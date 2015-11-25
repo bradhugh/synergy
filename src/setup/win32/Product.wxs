@@ -14,7 +14,7 @@
       Version="$(var.Version)"
       Manufacturer="$(var.Author)">
     
-    <Package InstallerVersion="300" Compressed="yes" InstallScope="perMachine" />
+    <Package InstallerVersion="405" Compressed="yes" InstallScope="perMachine" />
     <MajorUpgrade DowngradeErrorMessage="A newer version of $(var.Name) is already installed." />
     <MediaTemplate EmbedCab="yes" />
     <UIRef Id="WixUI_InstallDir" />

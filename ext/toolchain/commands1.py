@@ -259,7 +259,9 @@ class InternalCommands:
 		3 : VisualStudioGenerator('9 2008'),
 		4 : VisualStudioGenerator('9 2008 Win64'),
 		5 : VisualStudioGenerator('8 2005'),
-		6 : VisualStudioGenerator('8 2005 Win64')
+		6 : VisualStudioGenerator('8 2005 Win64'),
+		7 : VisualStudioGenerator('11'),
+		8 : VisualStudioGenerator('11 Win64')
 	}
 
 	unix_generators = {
@@ -900,7 +902,7 @@ class InternalCommands:
 
 		if generator.startswith('Visual Studio'):
 			# special case for version 10, use new /target:clean
-			if generator.startswith('Visual Studio 10'):
+			if generator.startswith('Visual Studio 1'):
 				for target in targets:
 					self.run_vcbuild(generator, target, self.sln_filepath(), '/target:clean')
 				
@@ -1303,8 +1305,11 @@ class InternalCommands:
 		version = self.getVersionNumber()
 		args = "/p:DefineConstants=\"Version=%s\"" % version
 		
+		# Configuration for WIX
+		config = 'release'
+		
 		self.run_vcbuild(
-			generator, 'release', 'synergy.sln', args,
+			generator, config, 'synergy.sln', args,
 			'src/setup/win32/', 'x86')
 		
 		filename = "%s-%s-Windows-%s.msi" % (
@@ -1312,8 +1317,8 @@ class InternalCommands:
 			self.getVersionForFilename(),
 			arch)
 			
-		old = "bin/Release/synergy.msi"
-		new = "bin/Release/%s" % (filename)
+		old = "bin/%s/synergy.msi" % (config)
+		new = "bin/%s/%s" % (config, filename)
 		
 		try:
 			os.remove(new)
@@ -1750,6 +1755,8 @@ class InternalCommands:
 			value,type = _winreg.QueryValueEx(key, '9.0')
 		elif generator.startswith('Visual Studio 10'):
 			value,type = _winreg.QueryValueEx(key, '10.0')
+		elif generator.startswith('Visual Studio 11'):
+			value,type = _winreg.QueryValueEx(key, '11.0')
 		else:
 			raise Exception('Cannot determine vcvarsall.bat location for: ' + generator)
 		
@@ -1792,7 +1799,7 @@ class InternalCommands:
 		else:
 			config = 'Debug'
 				
-		if generator.startswith('Visual Studio 10'):
+		if generator.startswith('Visual Studio 1'):
 			cmd = ('@echo off\n'
 				'call "%s" %s \n'
 				'cd "%s"\n'
